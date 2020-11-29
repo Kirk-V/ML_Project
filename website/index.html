@@ -1,0 +1,33 @@
+<meta charset="utf-8">
+
+<html>
+  <head>
+    <script type="text/javascript" src="script.js"></script>
+    <link rel="stylesheet" href="main.css">
+  </head>
+
+  <body>
+    <div id="main_content">
+      <h1 align="center">Actor Face Recognition</h1>
+
+      <form method="post" enctype="multipart/form-data">
+	<label for="user_file">Choose image or video to upload</label>
+	<input type="file" id="user_file" name="filename" onchange="upload_file(this);">
+      </form>
+      
+      <div id="video_container">
+	<video></video>
+	<div id="controls">
+	  <input type="range" min="1" max="100" value="50" class="slider" id="start_range">
+	  <input type="range" min="1" max="100" value="50" class="slider" id="end_range">
+	  <br>
+	  <label for="start_time">Start Time:</label>
+	  <input type="text" id="start_time">
+	  <label for="end_time">End Time:</label>
+	  <input type="text" id="end_time">
+	  <button onclick="send_request(this);">Send Request</button>
+	</div>
+      </div>
+    </div>
+  </body>
+</html>

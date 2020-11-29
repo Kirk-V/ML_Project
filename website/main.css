@@ -1,0 +1,25 @@
+#main_content {
+    max-width: 70%;
+    margin-right: auto;
+    margin-left: auto;
+}
+
+#video_container {
+    height: auto;
+    max-width: 100%;
+}
+
+#controls {
+    max-width: 100%;
+}
+
+#start_range {
+    z-index: 2;
+    position: absolute;
+    box-sizing: border-box;
+}
+
+#end_range {
+    z-index: 1;
+    box-sizing: border-box;
+}
