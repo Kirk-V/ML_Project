@@ -4,8 +4,6 @@ import socketserver
 from io import BytesIO
 import mimetypes
 
-import time
-
 #https://blog.anvileight.com/posts/simple-python-http-server/#do-post
 class Handler(http.server.SimpleHTTPRequestHandler):
     count = 0
@@ -31,8 +29,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             
             #call inference function, return images, names, probabilities
             #put into response format with JSON or XML
-
-            time.sleep(10)
             
             response = BytesIO()
             response.write(b"This is a POST response.")
