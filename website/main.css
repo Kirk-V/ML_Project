@@ -4,22 +4,33 @@
     margin-left: auto;
 }
 
-#video_container {
+video {
     height: auto;
     max-width: 100%;
+    margin-right: auto;
+    margin-left: auto;
 }
 
 #controls {
     max-width: 100%;
+    display: flex;
 }
 
 #start_range {
-    z-index: 2;
-    position: absolute;
+    width: 100%;
     box-sizing: border-box;
+    flex: 1 0 0;
+    min-width: 0; 
+    margin: 0;
+    padding: 0;
 }
 
 #end_range {
-    z-index: 1;
+    width: 100%;
     box-sizing: border-box;
+    flex: 1 0 0;
+    min-width: 0; 
+    margin: 0;
+    padding: 0;
 }
+
