@@ -12,9 +12,76 @@ const image_file_types = [
 ];
 
 //in seconds
-let video_length = null;
+let video_length = 100;
 let file = null;
 let file_type = null;
+let start_time = null;
+let stop_time = null;
+
+function setup() {
+    //setup slider
+    let slider = document.getElementById("slider");
+    start_time = video_length*0.25;
+    stop_time = video_length*0.75;
+    noUiSlider.create(slider, {
+	start: [start_time, stop_time],
+	connect: true,
+	range: {
+            'min': 0,
+            'max': Number(video_length)
+	}
+    });
+    
+    //hook it into inputs
+    const start = document.getElementById("start_time");
+    const end = document.getElementById("end_time");
+    const video = document.getElementById("video_player");
+    
+    slider.noUiSlider.on('update', function (values, handle) {
+	let value = values[handle];
+
+	if (handle) {
+            end.value = value;
+	    stop_time = value;
+	}
+	else {
+            start.value = Math.round(value);
+	    start_time = value;
+	    video.currentTime = value;
+	}
+    });
+
+    start.addEventListener('change', function () {
+	slider.noUiSlider.set([this.value, null]);
+	start_time = this.value;
+	video.currentTime = this.value;
+    });
+
+    end.addEventListener('change', function () {
+	slider.noUiSlider.set([null, this.value]);
+	stop_time = this.value;
+    });
+
+    //setup video
+    this.currentTime = start_time;
+    
+    video.addEventListener("timeupdate", function(){
+	if(this.currentTime > stop_time) {
+            this.pause();
+	    this.currentTime = start_time;
+	    this.play();
+	}
+    });
+
+    video.addEventListener("click", function(){
+	if (this.paused == true) {
+            video.play();
+        }
+        else{
+            video.pause();
+        }
+    });
+}
 
 function validFileType(type) {
     if(video_file_types.includes(type)) {
@@ -28,8 +95,8 @@ function validFileType(type) {
 
 function upload_file(that) {
     video_length = null;
-    const video = document.getElementById("video_container").getElementsByTagName("video")[0];
-    const image = document.getElementById("video_container").getElementsByTagName("img")[0];
+    const video = document.getElementById("video_player");
+    const image = document.getElementById("image_player");
 
     file = that.files[0];
     file_type = validFileType(file.type)
@@ -44,7 +111,8 @@ function upload_file(that) {
 	image.style.display = "none";
 	video.setAttribute("src", URL.createObjectURL(file));
 	video.addEventListener('loadedmetadata', function() {
-	    setup(video.duration);	
+	    video_length = video.duration;
+	    setup();
 	});
     }
 
@@ -55,60 +123,17 @@ function upload_file(that) {
     }
 }
 
-//https://www.simple.gy/blog/range-slider-two-handles/
-function seek(target, event) {
-    start_range = document.getElementById("start_range");
-    end_range = document.getElementById("end_range");
-    
-    start_time = document.getElementById("start_time");
-    end_time = document.getElementById("end_time");
-
-    let pivot = null;
-    
-    if(target === start_range) {
-	if(start_range.valueAsNumber >= start_range.max) {
-	    pivot = Math.min(video_length, Number(start_range.max) );
-	}		
-    }
-    else if(target === end_range) {
-	if(end_range.valueAsNumber <= end_range.min) {
-	    pivot = Math.min(0, Number(end_range.min));
-	}
-    }
-
-    if(pivot != null) {
-	start_range.max = pivot;
-	end_range.min = pivot;
-    }
-    
-    start_range.style.flexGrow = Number(start_range.max) - Number(start_range.min);
-    end_range.style.flexGrow = Number(end_range.max) - Number(end_range.min);
-
-    start_time.value = start_range.value;
-    end_time.value = end_range.value;
-}
-
-function setup(length) {
-    video_length = length;
-    start = document.getElementById("start_range");
-    end = document.getElementById("end_range");
-
-    start_time = document.getElementById("start_time");
-    end_time = document.getElementById("end_time");
-    
-    start.min = 0;
-    start.max = video_length/2;
-    end.min = video_length/2;
-    end.max = video_length;
-
-    start_time.value = video_length*0.25;
-    end_time.value = video_length*0.75;
+function set_video_time(start, end) {
+    const video = document.getElementById("video_player");
+    video.currentTime = start;
+    start_time = start;
+    stop_time = end;
 }
 
 function send_request(that) {
     var httpRequest = new XMLHttpRequest();
     httpRequest.open("POST", "/post/send_request", true);
-    httpRequest.setRequestHeader("Content-type", file.type);
+    httpRequest.setRequestHeader("Content-type", "application/json");
     httpRequest.responseType = 'text';
         
     httpRequest.onreadystatechange = function() {
@@ -116,9 +141,23 @@ function send_request(that) {
 	    process_response(httpRequest.responseText);
 	}
     };
+
+    start = start_time;
+    end = end_time;
     
-    httpRequest.send(file);
-    
+    let req = new Object();
+    req.start = start;
+    req.end = end;
+    req.file_type = file.type;
+
+    //could find a way to actually clip the video and only send that
+    //could also send two posts, one json, one binary blob instead (should be faster)
+    let reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = function() {
+	req.media_file = reader.result.substr(reader.result.indexOf(",")+1);
+	httpRequest.send(JSON.stringify(req));
+    }    
 }
 
 function process_response(response) {
@@ -127,12 +166,7 @@ function process_response(response) {
 }
 
 function main() {
-    start = document.getElementById("start_range");
-    end = document.getElementById("end_range");
-    
-    start_range.onmousemove = function(e) {seek(start, event)};
-    end_range.onmousemove = function(e) {seek(end, event)};
-    
+
     return 0;
 }
 

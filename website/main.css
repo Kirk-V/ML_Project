@@ -13,24 +13,5 @@ video {
 
 #controls {
     max-width: 100%;
-    display: flex;
-}
-
-#start_range {
-    width: 100%;
-    box-sizing: border-box;
-    flex: 1 0 0;
-    min-width: 0; 
-    margin: 0;
-    padding: 0;
-}
-
-#end_range {
-    width: 100%;
-    box-sizing: border-box;
-    flex: 1 0 0;
-    min-width: 0; 
-    margin: 0;
-    padding: 0;
 }
 

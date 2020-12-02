@@ -3,6 +3,8 @@
 <html>
   <head>
     <script type="text/javascript" src="script.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.3/nouislider.min.js "></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/14.6.3/nouislider.css" rel="stylesheet">
     <link rel="stylesheet" href="main.css">
   </head>
 
@@ -16,18 +18,16 @@
       </form>
       
       <div id="video_container">
-	<video></video>
-	<img></img>
-	<div id="controls">
-	  <input type="range" min="0" max="100" step="0.1" class="slider" id="start_range">
-	  <input type="range" min="0" max="100" step="0.1" class="slider" id="end_range">
-	</div>
-	
+	  <video id="video_player"></video>
+	  <img id="image_player"></img>
+      </div>
+      <div id="controls">
+	<div id="slider"></div>
 	<br>
 	<label for="start_time">Start Time:</label>
-	<input type="text" id="start_time">
+	<input type="number" id="start_time">
 	<label for="end_time">End Time:</label>
-	<input type="text" id="end_time">
+	<input type="number" id="end_time">
 	<br>
 	<button onclick="send_request(this);">Send Request</button>
       </div>
