@@ -143,7 +143,7 @@ function send_request(that) {
     };
 
     start = start_time;
-    end = end_time;
+    end = stop_time;
     
     let req = new Object();
     req.start = start;

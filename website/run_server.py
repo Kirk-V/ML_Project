@@ -22,7 +22,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if file_type != "application/json":
                 self.send_response(400)
                 self.end_headers()
-                response = json.dumps(["error": "not json data"])
+                response = json.dumps(["error", "not json data"])
                 self.wfile.write(response.encode())
                 print("sent 400 repsonse")
                 return
