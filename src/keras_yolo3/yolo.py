@@ -27,8 +27,8 @@ class YOLO(object):
         "model_path": "keras_yolo3/model_data/yolo.h5",
         "anchors_path": "keras_yolo3/model_data/yolo_anchors.txt",
         "classes_path": "keras_yolo3/model_data/coco_classes.txt",
-        "score": 0.5,
-        "iou": 0.45,
+        "score": 0.65,
+        "iou": 0.5,
         "model_image_size": (416, 416),
         "gpu_num": 0,
     }
@@ -205,7 +205,7 @@ class YOLO(object):
                 text_origin = np.array([left, bottom])
 
             # My kingdom for a good redistributable image drawing library.
-            for i in range(thickness):
+            for i in range(1):
                 draw.rectangle(
                     [left + i, top + i, right - i, bottom - i], outline=self.colors[c]
                 )

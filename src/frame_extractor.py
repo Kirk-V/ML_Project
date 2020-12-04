@@ -85,6 +85,8 @@ class FrameExtractor:
 
         if (video.isOpened()== False): 
             print("Error opening video file")
+        length = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+        print("The video has {} Frames".format(length))
 
         while(video.isOpened()):
             ret, frame = video.read()
@@ -95,6 +97,8 @@ class FrameExtractor:
 
                 cv2.imwrite( directory + "/frame%d.jpg" % count, frame) 
                 count += self.rate
+                if (count > length):
+                    break
                 #set the VideoCapture obj to increase by 'count' frames
                 video.set(1, count)
                 # Press Q on keyboard to  exit
@@ -103,3 +107,5 @@ class FrameExtractor:
             # Break the loop if no more frames could be retrieved 
             else: 
                 break
+
+        video.release()

@@ -13,8 +13,8 @@ class Handler(http.server.SimpleHTTPRequestHandler):
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
     
     def do_POST(self):
-        if self.path == "/post/send_request":
-            print("got request")
+        if self.path == "/post/send_json":
+            print("got json")
 
             #look at header
             content_length = int(self.headers["Content-Length"])
@@ -22,7 +22,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             if file_type != "application/json":
                 self.send_response(400)
                 self.end_headers()
-                response = json.dumps(["error", "not json data"])
+                response = json.dumps(["status", "error: not json data"])
                 self.wfile.write(response.encode())
                 print("sent 400 repsonse")
                 return
@@ -36,21 +36,42 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             
             start = float(data["start"])
             end = float(data["end"])
-            file_ext = mimetypes.guess_extension(data["file_type"])
-            media_file = base64.b64decode(data["media_file"])
+            file_type = data["file_type"]
             
-            f = open("./tmp/" + str(Handler.count) + file_ext, "wb")
+            f = open("./tmp/" + str(Handler.count) + ".json", "w")
             Handler.count += 1
-            f.write(media_file);
+            f.write(str(Handler.count) + "\n" + str(start) + "\n" + str(end) + "\n" + file_type + "\n");
+            f.close();
+            
+            response = json.dumps(["json: recieved"])
+            
+            self.wfile.write(response.encode())
+            print("sent 200 repsonse")
+            
+        if self.path == "/post/send_data":
+            print("got data")
+
+            #look at header
+            content_length = int(self.headers["Content-Length"])
+            file_type = self.headers["Content-type"]
+            file_ext = mimetypes.guess_extension(file_type);
+            
+            self.send_response(200)
+            self.end_headers()
+
+            #unpack data
+            body = self.rfile.read(content_length)
+             
+            f = open("./tmp/" + str(Handler.count) + file_ext, "wb")
+            f.write(body);
             f.close();
             
             #call inference function, return images, names, probabilities
             #put into response format with JSON or XML
-            
-            response = json.dumps(["hello world"])
+            response = json.dumps(["data: recieved"])
             
             self.wfile.write(response.encode())
-            print("sent 200 repsonse")
+            print("sent 200 repsonse")            
             
 def main():
     host = "127.0.0.1"
