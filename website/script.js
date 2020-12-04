@@ -15,6 +15,7 @@ const image_file_types = [
 let video_length = 100;
 let file = null;
 let file_type = null;
+let file_size = null;
 let start_time = null;
 let stop_time = null;
 
@@ -65,13 +66,7 @@ function setup() {
     //setup video
     this.currentTime = start_time;
     
-    video.addEventListener("timeupdate", function(){
-	if(this.currentTime > stop_time) {
-            this.pause();
-	    this.currentTime = start_time;
-	    this.play();
-	}
-    });
+    video.addEventListener("timeupdate", stop_video);
 
     video.addEventListener("click", function(){
 	if (this.paused == true) {
@@ -81,6 +76,14 @@ function setup() {
             video.pause();
         }
     });
+}
+
+function stop_video() {
+    if(this.currentTime > stop_time) {
+	this.pause();
+	this.currentTime = start_time;
+	this.play();
+    }
 }
 
 function validFileType(type) {
@@ -100,6 +103,7 @@ function upload_file(that) {
 
     file = that.files[0];
     file_type = validFileType(file.type)
+    file_size = file.size;
     
     if(file_type === null) {
 	console.log("unsupported file type")
@@ -123,16 +127,14 @@ function upload_file(that) {
     }
 }
 
-function set_video_time(start, end) {
-    const video = document.getElementById("video_player");
-    video.currentTime = start;
-    start_time = start;
-    stop_time = end;
+function send_request(that) {
+    send_json(that);
+    send_data(that);
 }
 
-function send_request(that) {
+function send_json(that) {
     var httpRequest = new XMLHttpRequest();
-    httpRequest.open("POST", "/post/send_request", true);
+    httpRequest.open("POST", "/post/send_json", true);
     httpRequest.setRequestHeader("Content-type", "application/json");
     httpRequest.responseType = 'text';
         
@@ -141,23 +143,29 @@ function send_request(that) {
 	    process_response(httpRequest.responseText);
 	}
     };
-
-    start = start_time;
-    end = stop_time;
     
-    let req = new Object();
-    req.start = start;
-    req.end = end;
-    req.file_type = file.type;
+    let body = new Object();
+    body.start = start_time;
+    body.end = stop_time;
+    body.file_type = file.type;
+    
+    httpRequest.send(JSON.stringify(body));
+}
+
+function send_data(that) {
+     var httpRequest = new XMLHttpRequest();
+    httpRequest.open("POST", "/post/send_data", true);
+    httpRequest.setRequestHeader("Content-type", file.type);
+    httpRequest.responseType = 'text';
+        
+    httpRequest.onreadystatechange = function() {
+	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
+	    process_response(httpRequest.responseText);
+	}
+    };
 
     //could find a way to actually clip the video and only send that
-    //could also send two posts, one json, one binary blob instead (should be faster)
-    let reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onloadend = function() {
-	req.media_file = reader.result.substr(reader.result.indexOf(",")+1);
-	httpRequest.send(JSON.stringify(req));
-    }    
+    httpRequest.send(file);
 }
 
 function process_response(response) {
@@ -166,7 +174,6 @@ function process_response(response) {
 }
 
 function main() {
-
     return 0;
 }
 
