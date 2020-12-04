@@ -68,7 +68,7 @@ class FrameExtractor:
                 print ("Successfully created the directory %s " % path)
 
 
-    def store_frames(self, directory='Frames'):
+    def store_frames(self, directory='imagesToDetect'):
         """ Stores the frames from the video (passed to constructor) at the
         location provided by param: directory
 
@@ -93,7 +93,7 @@ class FrameExtractor:
                 if (self.showFrames):
                     cv2.imshow('Frame',frame)
 
-                cv2.imwrite( directory + "\\frame%d.jpg" % count, frame) 
+                cv2.imwrite( directory + "/frame%d.jpg" % count, frame) 
                 count += self.rate
                 #set the VideoCapture obj to increase by 'count' frames
                 video.set(1, count)
