@@ -1,5 +1,16 @@
 # VideosFolder #
 ###################
+src/videos/*.mp4
 
-videos/
-/part1/
+
+
+# Images Folders #
+###################
+src/detectedImages/*.jpg
+src/imagesToDetect/*.jpg
+
+
+# pycache #
+###################
+*__pycache__*
+*/__pycache__/*
