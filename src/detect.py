@@ -20,7 +20,6 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
       detections: a list of bounding boxes in format [filename,[(xmin,ymin,xmax,ymax,class_id,confidence]]
 
     """
-
     save_img = True #always save the images for now
 
     #keeping the output folder static for time being
@@ -60,4 +59,35 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
           new_image.save(os.path.join(save_img_path, img_out))
 
     return detections
+
+
+def crop(boxList, directory='detectedImages'):
+    """
+    Crops images within a folder based on the passed list of bounding boxes for
+    the faces on each image. 
+
+    Args:
+      directory: string
+          folder where the images to crop are
+
+      boxList: list 
+          2D list of [['imageName', 'minx, miny, maxx, maxy']
+
+    Returns:
+    """
+    for img in boxList:
+        imgName = img[0]
+        if len(img[1]) > 0:
+            image = Image.open(directory+'/'+imgName)
+            saveCount = 0
+            for box in img[1]:
+                left = box[0]
+                top = box[1]
+                right = box[2]
+                bottom = box[3]
+                cropped = image.crop((left, top, right, bottom))
+                saveDir = directory+'/'+str(saveCount)+imgName
+                cropped.save(saveDir)
+                saveCount += 1
+        os.remove(directory+'/'+imgName)
 
