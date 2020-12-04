@@ -14,6 +14,8 @@ src/imagesToDetect/*.jpg
 ###################
 *__pycache__*
 */__pycache__/*
+/src/delete_files.py
+/src/rename_folders.py
 
 
 # website tmp folder
