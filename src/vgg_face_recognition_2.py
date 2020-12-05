@@ -8,7 +8,15 @@ Original file is located at
 """
 import tensorflow as tf
 from tensorflow.keras.applications import VGG16
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, GlobalAveragePooling2D
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
+from tensorflow.keras.models import Model
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.optimizers import RMSprop, Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 
+# Set GPU options
 gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
 session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
 
@@ -41,10 +49,6 @@ def Fc(bottom_model, num_classes):
     top_model = Dense(num_classes,activation='softmax')(top_model)
     return top_model
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, GlobalAveragePooling2D
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
-from tensorflow.keras.models import Model
 
 # Set our class number to 3 (Young, Middle, Old)
 num_classes = 5
@@ -54,8 +58,6 @@ FC_Head = Fc(vgg, num_classes)
 model = Model(inputs = vgg.input, outputs = FC_Head)
 
 print(model.summary())
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 train_data_dir = "./DataSetToSend/"
 # validation_data_dir = '/content/drive/My Drive/image_dataset/validate/'
@@ -73,13 +75,14 @@ train_datagen = ImageDataGenerator(
 validation_datagen = ImageDataGenerator(rescale=1./255)
  
 # set our batch size (typically on most mid tier systems we'll use 16-32)
-batch_size = 32
+batch_size = 64
  
 train_generator = train_datagen.flow_from_directory(
         train_data_dir,
         subset="training",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
+        seed=42,
         class_mode='categorical')
  
 validation_generator = train_datagen.flow_from_directory(
@@ -87,10 +90,9 @@ validation_generator = train_datagen.flow_from_directory(
         subset="validation",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
+        seed=42,
         class_mode='categorical')
 
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 checkpoint = ModelCheckpoint("face_vgg.h5",
                              monitor="val_loss",
                              mode="min",
@@ -113,9 +115,9 @@ model.compile(loss = 'categorical_crossentropy',
 nb_train_samples = 200
 nb_validation_samples = 200
 # We only train 50 EPOCHS
-epochs = 50
+epochs = 30
 batch_size = 64
-history = model.fit_generator(
+history = model.fit(
     train_generator,
     # steps_per_epoch = nb_train_samples // batch_size,
     epochs = epochs,
@@ -123,15 +125,40 @@ history = model.fit_generator(
     validation_data = validation_generator)
     # validation_steps = nb_validation_samples // batch_size)
 
-## Visualizing results
+#Fine Tune
+vgg.trainable = True
+adam = Adam(learning_rate=0.0001)
+
+#recompile model
+model.compile(loss = 'categorical_crossentropy',
+              optimizer = adam,
+              metrics = ['accuracy'])
+
+len(model.trainable_variables)
+
+for (i,layer) in enumerate(vgg.layers):
+    print(str(i) + " "+ layer.__class__.__name__, layer.trainable)
+
+fine_tune_epochs = 10
+total_epochs = fine_tune_epochs + epochs
+# total_epochs =  initial_epochs + fine_tune_epochs
+model.summary()
+
+history_fine = model.fit(train_generator,
+                        epochs=total_epochs,
+                        initial_epoch = history.epoch[-1],
+                        validation_data=validation_generator)
+
+epochs_range = range(epochs)
+
+history = history_fine
+# Visualizing results
 import matplotlib.pyplot as plt
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 
 loss = history.history['loss']
 val_loss = history.history['val_loss']
-
-epochs_range = range(epochs)
 
 plt.figure(figsize=(8, 8))
 plt.subplot(1, 2, 1)
