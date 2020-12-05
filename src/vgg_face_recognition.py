@@ -62,6 +62,7 @@ train_data_dir = "../DataSetToSend/"
 
 # Let's use some data augmentaiton 
 train_datagen = ImageDataGenerator(
+      validation_split=0.2,
       rescale=1./255,
       rotation_range=45,
       width_shift_range=0.3,
@@ -76,12 +77,14 @@ batch_size = 32
  
 train_generator = train_datagen.flow_from_directory(
         train_data_dir,
+        subset="training",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
         class_mode='categorical')
  
-validation_generator = validation_datagen.flow_from_directory(
+validation_generator = train_datagen.flow_from_directory(
         train_data_dir,
+        subset="validation",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
         class_mode='categorical')
@@ -110,15 +113,15 @@ model.compile(loss = 'categorical_crossentropy',
 nb_train_samples = 200
 nb_validation_samples = 200
 # We only train 5 EPOCHS 
-epochs = 5
+epochs = 10
 batch_size = 64
 history = model.fit_generator(
     train_generator,
-    steps_per_epoch = nb_train_samples // batch_size,
+    # steps_per_epoch = nb_train_samples // batch_size,
     epochs = epochs,
     callbacks = callbacks,
-    validation_data = validation_generator,
-    validation_steps = nb_validation_samples // batch_size)
+    validation_data = validation_generator)
+    # validation_steps = nb_validation_samples // batch_size)
 
 ## Visualizing results
 import matplotlib.pyplot as plt
