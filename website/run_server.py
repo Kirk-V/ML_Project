@@ -1,4 +1,6 @@
-#!/usr/bin/python3
+#!/usr/bin/python3.7
+import sys
+
 import http.server
 import socketserver
 import json
@@ -11,24 +13,28 @@ from moviepy.video.io.VideoFileClip import VideoFileClip
 class Handler(http.server.SimpleHTTPRequestHandler):
     count = 0
     
-    def do_GET(self):        
+    def do_GET(self):
         return http.server.SimpleHTTPRequestHandler.do_GET(self)
     
     def do_POST(self):
         if self.path == "/post/send_json":
-            print("got json")
+            print("got send_json request")
 
             #look at header
             content_length = int(self.headers["Content-Length"])
-            file_type = self.headers["Content-type"]
+            file_type = self.headers["Content-Type"]
+            
             if file_type != "application/json":
+                self.send_header("Content-type", "application/json")
                 self.send_response(400)
                 self.end_headers()
+                
                 response = json.dumps(["status", "error: not json data"])
                 self.wfile.write(response.encode())
-                print("sent 400 repsonse")
+                print("send_json sent 400 repsonse")
                 return
-
+            
+            self.send_header("Content-Type", "application/json")
             self.send_response(200)
             self.end_headers()
 
@@ -47,16 +53,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             response = json.dumps(["json: recieved"])
             
             self.wfile.write(response.encode())
-            print("sent 200 repsonse")
+            print("send_json sent 200 repsonse")
             
         if self.path == "/post/send_data":
-            print("got data")
+            print("got send_data")
 
             #look at header
             content_length = int(self.headers["Content-Length"])
-            file_type = self.headers["Content-type"]
+            file_type = self.headers["Content-Type"]
             file_ext = mimetypes.guess_extension(file_type);
-            
+
+            self.send_header("Content-type", "application/json")
             self.send_response(200)
             self.end_headers()
 
@@ -74,19 +81,36 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             start_time = float(lines[1])
             end_time = float(lines[2])
             
-            #clip
             ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + file_ext,
                                   start_time, end_time,
                                   targetname="./tmp/" + str(Handler.count) + "_clip" + file_ext)
             
-            #call inference function, return images, names, probabilities
-            #put into response format with JSON or XML
+            #annotate("./tmp/" + str(Handler.count) + "_clip" + file_ext)
+            ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + file_ext,
+                                  start_time, end_time,
+                                  targetname="./tmp/" + str(Handler.count) + "_clip_annotated" + file_ext)
+            
+            
             response = json.dumps(["data: recieved"])
-            Handler.count += 1
 
             self.wfile.write(response.encode())
-            print("sent 200 repsonse")            
+            print("send_data sent 200 repsonse")            
             
+        if self.path == "/post/get_data":
+            print("got get_data request")
+
+            #should change to proper clip with boxes
+            f = open("./tmp/" + str(Handler.count) + "_clip_annotated.mp4", "rb")
+            annotated_clip = f.read()
+            f.close()
+
+            self.send_response(200)
+            self.send_header("Content-Type", "video/mp4")
+            self.end_headers()
+
+            self.wfile.write(annotated_clip)
+            print("get_data sent 200 repsonse")
+                        
 def main():
     host = "127.0.0.1"
     port = 8080

@@ -113,7 +113,8 @@ function upload_file(that) {
     if(file_type === "video") {
 	video.style.display = "block";
 	image.style.display = "none";
-	video.setAttribute("src", URL.createObjectURL(file));
+	let blob = URL.createObjectURL(file)
+	video.setAttribute("src", blob);
 	video.addEventListener('loadedmetadata', function() {
 	    video_length = video.duration;
 	    setup();
@@ -133,14 +134,14 @@ function send_request(that) {
 }
 
 function send_json(that) {
-    var httpRequest = new XMLHttpRequest();
+    let httpRequest = new XMLHttpRequest();
     httpRequest.open("POST", "/post/send_json", true);
     httpRequest.setRequestHeader("Content-type", "application/json");
     httpRequest.responseType = 'text';
         
     httpRequest.onreadystatechange = function() {
 	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
-	    process_response(httpRequest.responseText);
+	    console.log("send_json() successful");
 	}
     };
     
@@ -153,24 +154,52 @@ function send_json(that) {
 }
 
 function send_data(that) {
-     var httpRequest = new XMLHttpRequest();
+    let httpRequest = new XMLHttpRequest();
     httpRequest.open("POST", "/post/send_data", true);
     httpRequest.setRequestHeader("Content-type", file.type);
     httpRequest.responseType = 'text';
         
     httpRequest.onreadystatechange = function() {
 	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
-	    process_response(httpRequest.responseText);
+	    console.log("send_data() successful")
+	    const table = document.getElementById("output_table");
+	    table.innerHTML = httpRequest.responseText;
+	    get_data();
 	}
     };
-
-    //could find a way to actually clip the video and only send that
+    
     httpRequest.send(file);
 }
 
-function process_response(response) {
-    output = document.getElementById("output");
-    output.innerHTML = response;
+function get_data() {
+    var httpRequest = new XMLHttpRequest();
+    httpRequest.open("POST", "/post/get_data", true);
+    httpRequest.setRequestHeader("Content-type", "video/mp4");
+    httpRequest.responseType = "blob";
+    
+    httpRequest.onreadystatechange = function() {
+	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
+	    console.log("get_data() successful");
+	    
+	    const video = document.getElementById("output_video");
+	    let annotated_file = httpRequest.response
+	    let blob = new Blob([annotated_file], {type: "video/mp4"});
+	    
+	    video.setAttribute("src", URL.createObjectURL(blob));
+	    
+	    video.addEventListener("timeupdate", stop_video);
+	    video.addEventListener("click", function(){
+		if (this.paused == true) {
+		    video.play();
+		}
+		else{
+		    video.pause();
+		}
+	    });
+	}
+    };
+    
+    httpRequest.send();
 }
 
 function main() {
