@@ -112,8 +112,8 @@ model.compile(loss = 'categorical_crossentropy',
 # Enter the number of training and validation samples here
 nb_train_samples = 200
 nb_validation_samples = 200
-# We only train 5 EPOCHS 
-epochs = 10
+# We only train 50 EPOCHS
+epochs = 50
 batch_size = 64
 history = model.fit_generator(
     train_generator,

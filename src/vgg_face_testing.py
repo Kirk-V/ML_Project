@@ -8,7 +8,7 @@ session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_op
 classifier = load_model('face_vgg.h5')
 
 # for i in range(0,10):
-input_im = cv2.imread("./detectedImages/0download.jpg")
+input_im = cv2.imread("./detectedImages/0167395_v9_bb.jpg")
 # cv2.imshow('image', input_im)
 input_original = input_im.copy()
 input_original = cv2.resize(input_original, None, fx=0.5, fy=0.5, interpolation = cv2.INTER_LINEAR)
