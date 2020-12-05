@@ -2,8 +2,10 @@
 import http.server
 import socketserver
 import json
-import base64
 import mimetypes
+
+from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+from moviepy.video.io.VideoFileClip import VideoFileClip
 
 #https://blog.anvileight.com/posts/simple-python-http-server/#do-post
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -38,8 +40,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             end = float(data["end"])
             file_type = data["file_type"]
             
-            f = open("./tmp/" + str(Handler.count) + ".json", "w")
-            Handler.count += 1
+            f = open("./tmp/" + str(Handler.count) + ".txt", "w")
             f.write(str(Handler.count) + "\n" + str(start) + "\n" + str(end) + "\n" + file_type + "\n");
             f.close();
             
@@ -61,15 +62,28 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             #unpack data
             body = self.rfile.read(content_length)
-             
+            
             f = open("./tmp/" + str(Handler.count) + file_ext, "wb")
             f.write(body);
             f.close();
+
+            #read in 
+            f = open("./tmp/" + str(Handler.count) + ".txt", "r")
+            lines = f.readlines();
+
+            start_time = float(lines[1])
+            end_time = float(lines[2])
+            
+            #clip
+            ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + file_ext,
+                                  start_time, end_time,
+                                  targetname="./tmp/" + str(Handler.count) + "_clip" + file_ext)
             
             #call inference function, return images, names, probabilities
             #put into response format with JSON or XML
             response = json.dumps(["data: recieved"])
-            
+            Handler.count += 1
+
             self.wfile.write(response.encode())
             print("sent 200 repsonse")            
             
