@@ -11,7 +11,7 @@ def face_recognition():
     classifier = load_model('face_vgg.h5')
     conf = []
 
-    os.chdir("/detectedImages/")
+    os.chdir("./detectedImages/")
     for file in glob.glob("*.jpg"):
         # input_im = cv2.imread("./detectedImages/0220px-JayBaruchel08TIFF.jpg")
         input_im = cv2.imread(file)
@@ -26,7 +26,7 @@ def face_recognition():
 
         # Get Prediction
         res = classifier.predict(input_im, 1, verbose = 0)
-        conf.append(file, res)
+        conf.append([file, res])
 
     # conf is list of tuples; tuple is (filename, confidence list)
     return conf

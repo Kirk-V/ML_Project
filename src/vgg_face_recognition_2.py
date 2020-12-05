@@ -115,7 +115,7 @@ model.compile(loss = 'categorical_crossentropy',
 nb_train_samples = 200
 nb_validation_samples = 200
 # We only train 50 EPOCHS
-epochs = 30
+epochs = 15
 batch_size = 64
 history = model.fit(
     train_generator,
@@ -139,7 +139,7 @@ len(model.trainable_variables)
 for (i,layer) in enumerate(vgg.layers):
     print(str(i) + " "+ layer.__class__.__name__, layer.trainable)
 
-fine_tune_epochs = 10
+fine_tune_epochs = 5
 total_epochs = fine_tune_epochs + epochs
 # total_epochs =  initial_epochs + fine_tune_epochs
 model.summary()

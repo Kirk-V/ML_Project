@@ -1,12 +1,17 @@
 
 from keras_yolo3.yolo import YOLO, detect_video, detect_webcam
 from PIL import Image, ImageFont, ImageDraw
+import tensorflow as tf
 import numpy as np
 import os
 import cv2
 
 
 def detect_object(imageFolder='imagesToDetect/', postfix=""):
+
+    gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
+    session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
+
     """
     Calls the YOLO face detector on a folder and saves results to detectedImages folder
 
