@@ -11,8 +11,6 @@ img_width = 224
 
 vgg = VGG16(weights = 'imagenet',
             include_top = False,
-            # input_tensor=tf.keras.Input(shape=(img_height, img_width, 3)),
-            # pooling = 'max',
             input_shape = (img_height, img_width, 3))
 
 # freezing last 4 layers of a keras model
@@ -122,10 +120,7 @@ model.compile(loss = 'categorical_crossentropy',
 history = model.fit(
     train_ds,
     validation_data = val_ds,
-    # steps_per_epoch = train_samples // batch_size,
     epochs = epochs)
-    # callbacks = callbacks,
-    # validation_steps = val_samples // batch_size)
 
 
 ## Visualizing results

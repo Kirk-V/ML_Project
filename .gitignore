@@ -22,3 +22,4 @@ src/imagesToDetect/*.jpg
 ####################
 website/tmp
 
+/src/face_vgg.h5
