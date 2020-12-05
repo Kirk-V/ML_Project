@@ -22,4 +22,8 @@ src/imagesToDetect/*.jpg
 ####################
 website/tmp
 
+# dataSetToSend folder
+####################
+src/dataSetToSend/*
+
 /src/face_vgg.h5
