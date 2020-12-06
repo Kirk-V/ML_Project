@@ -136,7 +136,7 @@ function send_request(that) {
 function send_json(that) {
     let httpRequest = new XMLHttpRequest();
     httpRequest.open("POST", "/post/send_json", true);
-    httpRequest.setRequestHeader("Content-type", "application/json");
+    httpRequest.setRequestHeader("Content-Type", "application/json");
     httpRequest.responseType = 'text';
         
     httpRequest.onreadystatechange = function() {
@@ -156,14 +156,13 @@ function send_json(that) {
 function send_data(that) {
     let httpRequest = new XMLHttpRequest();
     httpRequest.open("POST", "/post/send_data", true);
-    httpRequest.setRequestHeader("Content-type", file.type);
-    httpRequest.responseType = 'text';
-        
+    httpRequest.setRequestHeader("Content-Type", "video/mp4");
+    httpRequest.responseType = "text";
+    
     httpRequest.onreadystatechange = function() {
 	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
 	    console.log("send_data() successful")
-	    const table = document.getElementById("output_table");
-	    table.innerHTML = httpRequest.responseText;
+	    make_table(JSON.parse(this.responseText));
 	    get_data();
 	}
     };
@@ -174,7 +173,7 @@ function send_data(that) {
 function get_data() {
     var httpRequest = new XMLHttpRequest();
     httpRequest.open("POST", "/post/get_data", true);
-    httpRequest.setRequestHeader("Content-type", "video/mp4");
+    httpRequest.setRequestHeader("Content-Type", "video/mp4");
     httpRequest.responseType = "blob";
     
     httpRequest.onreadystatechange = function() {
@@ -200,6 +199,37 @@ function get_data() {
     };
     
     httpRequest.send();
+}
+
+function make_table(json) {
+    console.log(json);
+    
+    const table = document.getElementById("output_table");
+    while(table.firstChild) {
+	table.firstChild.remove();
+    }
+    
+    let body = document.createElement('table');
+    
+    let tr = document.createElement("tr");
+    for(let i=0; i < Object.keys(json.results[0]).length; i++) {
+	let th = document.createElement("th");
+	th.appendChild(document.createTextNode(Object.keys(json.results[0])[i]));
+	tr.appendChild(th);
+    }
+    body.appendChild(tr);
+    
+    for(let i=0; i < json.results.length; i++) {
+	let tr = document.createElement("tr");
+	for(let j=0; j < Object.keys(json.results[i]).length; j++) {
+	    let td = document.createElement("td");
+	    keys = Object.keys(json.results[i]);
+	    td.appendChild(document.createTextNode(json.results[i][keys[j]]));
+	    tr.appendChild(td);
+	}
+	body.appendChild(tr);
+    }
+    table.appendChild(body);
 }
 
 function main() {

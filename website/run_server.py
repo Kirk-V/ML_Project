@@ -25,7 +25,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             file_type = self.headers["Content-Type"]
             
             if file_type != "application/json":
-                self.send_header("Content-type", "application/json")
+                self.send_header("Content-Type", "application/json")
                 self.send_response(400)
                 self.end_headers()
                 
@@ -34,10 +34,6 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                 print("send_json sent 400 repsonse")
                 return
             
-            self.send_header("Content-Type", "application/json")
-            self.send_response(200)
-            self.end_headers()
-
             #unpack data
             body = self.rfile.read(content_length)
             data = json.loads(body)
@@ -49,8 +45,12 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             f = open("./tmp/" + str(Handler.count) + ".txt", "w")
             f.write(str(Handler.count) + "\n" + str(start) + "\n" + str(end) + "\n" + file_type + "\n");
             f.close();
-            
-            response = json.dumps(["json: recieved"])
+
+            response = json.dumps({"json": "recieved"})
+    
+            self.send_response(200)
+            self.send_header("Content-Type", "application/json")
+            self.end_headers()
             
             self.wfile.write(response.encode())
             print("send_json sent 200 repsonse")
@@ -63,36 +63,38 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             file_type = self.headers["Content-Type"]
             file_ext = mimetypes.guess_extension(file_type);
 
-            self.send_header("Content-type", "application/json")
-            self.send_response(200)
-            self.end_headers()
-
             #unpack data
             body = self.rfile.read(content_length)
-            
+            #save video file
             f = open("./tmp/" + str(Handler.count) + file_ext, "wb")
             f.write(body);
             f.close();
 
-            #read in 
+            #read in metadata
             f = open("./tmp/" + str(Handler.count) + ".txt", "r")
             lines = f.readlines();
-
+            f.close()
+            
             start_time = float(lines[1])
             end_time = float(lines[2])
-            
-            ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + file_ext,
-                                  start_time, end_time,
-                                  targetname="./tmp/" + str(Handler.count) + "_clip" + file_ext)
-            
+
+            ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + "_clip" + file_ext,
+                                   start_time, end_time,
+                                   targetname="./tmp/" + str(Handler.count) + "_clip_annotated" + file_ext)
+                        
             #annotate("./tmp/" + str(Handler.count) + "_clip" + file_ext)
             ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + file_ext,
-                                  start_time, end_time,
-                                  targetname="./tmp/" + str(Handler.count) + "_clip_annotated" + file_ext)
-            
-            
-            response = json.dumps(["data: recieved"])
+                                   start_time, end_time,
+                                   targetname="./tmp/" + str(Handler.count) + "_clip_annotated" + file_ext)
 
+            response = json.dumps({"results": [{"class": "Actor 1", "probability": "0.80", "color": "blue"},
+                                               {"class": "Actor 2", "probability": "0.10", "color": "Red"},
+                                               {"class": "Actor 3", "probability": "0.10", "color": "Green"}]})
+            
+            self.send_response(200)
+            self.send_header("Content-Type", "video/mp4")
+            self.end_headers()
+            
             self.wfile.write(response.encode())
             print("send_data sent 200 repsonse")            
             
