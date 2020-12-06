@@ -10,11 +10,12 @@ import tensorflow as tf
 from tensorflow.keras.applications import VGG16, ResNet50V2
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, GlobalAveragePooling2D
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, Lambda
 from tensorflow.keras.models import Model
 from tensorflow.keras.preprocessing.image import ImageDataGenerator
 from tensorflow.keras.optimizers import RMSprop, Adam
 from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+import tensorflow_addons as tfa
 
 # Set GPU options
 gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
@@ -47,7 +48,7 @@ def Fc(bottom_model, num_classes):
     top_model = Dense(1024,activation='relu')(top_model)
     top_model = Dense(512,activation='relu')(top_model)
     top_model = Dense(num_classes,activation='softmax')(top_model)
-    return top_model
+    return top_mod
 
 
 # Set our class number to 3 (Young, Middle, Old)
@@ -114,7 +115,7 @@ earlystop = EarlyStopping(monitor = 'val_loss',
 # we put our call backs into a callback list
 callbacks = [earlystop, checkpoint]
 # We use a very small learning rate 
-model.compile(loss = 'categorical_crossentropy',
+model.compile(loss = 'categorical_crossentropy', 
               optimizer = RMSprop(lr = 0.001),
               metrics = ['accuracy'])
 # Enter the number of training and validation samples here

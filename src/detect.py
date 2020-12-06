@@ -8,7 +8,6 @@ import cv2
 
 
 def detect_object(imageFolder='imagesToDetect/', postfix=""):
-
     gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
     session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
 
@@ -28,7 +27,7 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
     save_img = True #always save the images for now
 
     #keeping the output folder static for time being
-    save_img_path = 'detectedImages/'
+    save_img_path = 'boxedImages/'
 
     #get detection output folder from params
     detect_path = imageFolder
@@ -66,7 +65,7 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
     return detections
 
 
-def crop(boxList, directory='detectedImages'):
+def crop(boxList, directory='./boxedImages'):
     """
     Crops images within a folder based on the passed list of bounding boxes for
     the faces on each image. 
@@ -91,24 +90,29 @@ def crop(boxList, directory='detectedImages'):
                 right = box[2]
                 bottom = box[3]
                 cropped = image.crop((left, top, right, bottom))
-                saveDir = directory+'/'+str(saveCount)+imgName
+                saveDir = './croppedImages'+'/'+str(saveCount)+imgName
                 cropped.save(saveDir)
                 saveCount += 1
-        os.remove(directory+'/'+imgName)
+        # os.remove('./croppedImages/'+imgName)
 
 
-def box(boxList, classes, indirectory='imagesToDetect', outdirectory='boxImages'):
-    for img in boxList:
-        imgName = img[0]
-        if len(img[1]) > 0:
-            image = cv2.imread(indirectory+'/'+imgName)
-            saveCount = 0
-            for box in img[1]:
+def box(boxList, classes, class_col, indirectory='boxedImages', outdirectory='boxImages'):
+    for img in classes:
+        imgName = img[0][1:]
+        boxNum = int(img[0][0])
+        label = img[1]
+        for boxes in boxList:
+            if boxes[0] == imgName:
+                # found image
+                box = boxes[1][boxNum]
                 left = box[0]
                 top = box[1]
                 right = box[2]
                 bottom = box[3]
+                image = cv2.imread(indirectory+'/'+imgName)
                 boxed = cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 3)
-                saveDir = outdirectory+'/'+imgName
+                boxed = cv2.putText(boxed, label, (left, bottom), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
+                cv2.imshow('test', boxed)
+                saveDir = indirectory+'/'+imgName
                 cv2.imwrite(saveDir, boxed)
-                saveCount += 1
+
