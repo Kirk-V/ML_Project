@@ -136,7 +136,7 @@ class YOLO(object):
         )
         return boxes, scores, classes
 
-    def detect_image(self, image, show_stats=True):
+    def detect_image(self, image, show_stats=False):
         start = timer()
 
         if self.model_image_size != (None, None):

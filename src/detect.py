@@ -36,7 +36,6 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
     yolo = YOLO()
 
     # list for min 
-    # images = []
     detections = []
     
     #iterate over all images in detect folder, try to open image and detect
@@ -110,9 +109,8 @@ def box(boxList, classes, class_col, indirectory='boxedImages', outdirectory='bo
                 right = box[2]
                 bottom = box[3]
                 image = cv2.imread(indirectory+'/'+imgName)
-                boxed = cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 3)
+                boxed = cv2.rectangle(image, (left, top), (right, bottom), class_col.get(label), 3)
                 boxed = cv2.putText(boxed, label, (left, bottom), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
-                cv2.imshow('test', boxed)
                 saveDir = indirectory+'/'+imgName
                 cv2.imwrite(saveDir, boxed)
 

@@ -3,7 +3,6 @@ import numpy as np
 def filter(classification_data, classesAvailable):
     classesFound = []
     for image in classification_data:
-        print(image)
         name = image[0]
         classes = image[1]
         bestValue = max(classes[0])
