@@ -1,5 +1,6 @@
 #!/usr/bin/python3.7
 import sys
+import os
 
 import http.server
 import socketserver
@@ -7,7 +8,9 @@ import json
 import mimetypes
 
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
-from moviepy.video.io.VideoFileClip import VideoFileClip
+
+sys.path.append("../src")
+from detect_classify import *
 
 #https://blog.anvileight.com/posts/simple-python-http-server/#do-post
 class Handler(http.server.SimpleHTTPRequestHandler):
@@ -78,15 +81,17 @@ class Handler(http.server.SimpleHTTPRequestHandler):
             start_time = float(lines[1])
             end_time = float(lines[2])
 
-            ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + "_clip" + file_ext,
-                                   start_time, end_time,
-                                   targetname="./tmp/" + str(Handler.count) + "_clip_annotated" + file_ext)
-                        
-            #annotate("./tmp/" + str(Handler.count) + "_clip" + file_ext)
             ffmpeg_extract_subclip("./tmp/" + str(Handler.count) + file_ext,
                                    start_time, end_time,
-                                   targetname="./tmp/" + str(Handler.count) + "_clip_annotated" + file_ext)
+                                   "./tmp/" + str(Handler.count) + "_clip" + file_ext)
 
+            os.chdir("../src")
+            print(os.getcwd())
+            classes = videoToFaces("../website/tmp/" + str(Handler.count) + "_clip" + file_ext,
+                                   "../website/tmp/" + str(Handler.count) + "_clip_annotated.mp4")
+            print(os.getcwd())
+            os.chdir("../website")
+            
             response = json.dumps({"results": [{"class": "Actor 1", "probability": "0.80", "color": "blue"},
                                                {"class": "Actor 2", "probability": "0.10", "color": "Red"},
                                                {"class": "Actor 3", "probability": "0.10", "color": "Green"}]})
