@@ -7,7 +7,7 @@ Original file is located at
     https://colab.research.google.com/drive/155DpJ_756FDztY5s6OX5EYBAKWyq9lXV
 """
 import tensorflow as tf
-from tensorflow.keras.applications import VGG16
+from tensorflow.keras.applications import VGG16, ResNet50V2
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, GlobalAveragePooling2D
 from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
@@ -24,7 +24,7 @@ session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_op
 img_rows, img_cols = 224, 224 
 
 # Re-loads the VGG model without the top or FC layers
-vgg = VGG16(weights = 'imagenet', 
+vgg = ResNet50V2(weights = 'imagenet', 
                  include_top = False, 
                  input_shape = (img_rows, img_cols, 3))
 
@@ -67,8 +67,9 @@ train_datagen = ImageDataGenerator(
       validation_split=0.2,
       rescale=1./255,
       rotation_range=45,
-      width_shift_range=0.3,
-      height_shift_range=0.3,
+      width_shift_range=0.4,
+      height_shift_range=0.4,
+      zoom_range=0.6,
       horizontal_flip=True,
       fill_mode='nearest')
  
@@ -83,13 +84,18 @@ train_generator = train_datagen.flow_from_directory(
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
         seed=42,
+        color_mode='grayscale',
         class_mode='categorical')
+
+print("#####################:")
+print(train_generator.class_indices)
  
 validation_generator = train_datagen.flow_from_directory(
         train_data_dir,
         subset="validation",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
+        color_mode='grayscale',
         seed=42,
         class_mode='categorical')
 
@@ -115,7 +121,7 @@ model.compile(loss = 'categorical_crossentropy',
 nb_train_samples = 200
 nb_validation_samples = 200
 # We only train 50 EPOCHS
-epochs = 15
+epochs = 20
 batch_size = 64
 history = model.fit(
     train_generator,
@@ -139,7 +145,7 @@ len(model.trainable_variables)
 for (i,layer) in enumerate(vgg.layers):
     print(str(i) + " "+ layer.__class__.__name__, layer.trainable)
 
-fine_tune_epochs = 5
+fine_tune_epochs = 10
 total_epochs = fine_tune_epochs + epochs
 # total_epochs =  initial_epochs + fine_tune_epochs
 model.summary()

@@ -1,6 +1,6 @@
 import numpy as np
 
-def filter(classification_data):
+def filter(classification_data, classesAvailable):
     classesFound = []
     for image in classification_data:
         print(image)
@@ -8,6 +8,6 @@ def filter(classification_data):
         classes = image[1]
         bestValue = max(classes[0])
         bestIndex = np.argmax(classes[0])
-        if (bestValue>.4):
-            classesFound.append([name, bestIndex, bestValue])
+        if (bestValue>.8):
+            classesFound.append([name, classesAvailable[bestIndex], bestValue])
     return classesFound

@@ -23,7 +23,7 @@ def face_recognition():
         input_im = cv2.resize(input_im, (224, 224), 3, interpolation = cv2.INTER_LINEAR)
         input_im = input_im / 255.
         input_im = input_im.reshape(1,224,224,3)
-
+        # cv2.imshow('image', input_im)
         # Get Prediction
         res = classifier.predict(input_im, 1, verbose = 0)
         conf.append([file, res])

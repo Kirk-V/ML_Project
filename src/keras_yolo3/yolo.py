@@ -27,7 +27,7 @@ class YOLO(object):
         "model_path": "keras_yolo3/model_data/yolo.h5",
         "anchors_path": "keras_yolo3/model_data/yolo_anchors.txt",
         "classes_path": "keras_yolo3/model_data/coco_classes.txt",
-        "score": 0.85,
+        "score": 0.65,
         "iou": 0.6,
         "model_image_size": (416, 416),
         "gpu_num": 0,
