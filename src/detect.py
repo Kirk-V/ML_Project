@@ -113,6 +113,6 @@ def box(boxList, classes, class_col, indirectory='boxedImages', outdirectory='bo
                 boxed = cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 3)
                 boxed = cv2.putText(boxed, label, (left, bottom), cv2.FONT_HERSHEY_SIMPLEX, 1, (0,255,0), 2)
                 cv2.imshow('test', boxed)
-                saveDir = indirectory+'/'+imgName
+                saveDir = outdirectory+'/'+imgName
                 cv2.imwrite(saveDir, boxed)
 

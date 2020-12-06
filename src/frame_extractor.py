@@ -93,7 +93,7 @@ class FrameExtractor:
                 if (self.showFrames):
                     cv2.imshow('Frame',frame)
 
-                cv2.imwrite( directory + "/%dframe.jpg" % count, frame) 
+                cv2.imwrite( directory + "/%05dframe.jpg" % count, frame) 
                 count += self.rate
                 if (count > length):
                     break

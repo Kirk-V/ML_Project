@@ -20,7 +20,7 @@ src/croppedImages/*
 
 # website tmp folder
 ####################
-website/tmp
+website/tmp/*
 
 # dataSetToSend folder
 ####################

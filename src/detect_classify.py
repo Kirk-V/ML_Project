@@ -38,14 +38,17 @@ def videoToFaces(videoPath, outputPath):
             path.unlink()
         elif path.is_dir():
             rmtree(path)
+    for path in Path('./boxImages').glob("**/*"):
+        if path.is_file():
+            path.unlink()
+        elif path.is_dir():
+            rmtree(path)
 
-
-    framer = FrameExtractor(videoPath, 2)
+    framer = FrameExtractor(videoPath, 1)
     framer.store_frames('imagesToDetect')
 
     # detect faces in imagesToDetect and store in boxedImages
     prediction = detect_object()
-
 
     crop(prediction)
 
@@ -55,23 +58,25 @@ def videoToFaces(videoPath, outputPath):
     classes = filter(classification, celebs)
 
     #make unique class colours
-    class_colours = ((255,0,   0),
-                     (0,  255, 0),
-                     (0,  0,   255))
-    
+    class_colours = ((255, 0,    0 ),
+                     (0,   255,   0),
+                     (0,   0,     255),
+                     (0,   255,   255),
+                     (255,  0,   255))
+        
     #box images
     boxes = box(prediction, classes, class_colours)
     
-    fourcc = cv2.VideoWriter_fourcc(*'MPV4') 
-    video = cv2.VideoWriter(outputPath, fourcc, 24, (1280, 720))
+    fourcc = cv2.VideoWriter_fourcc(*'H264') 
+    video = cv2.VideoWriter(outputPath, fourcc, 30, (1920, 1080))
 
-
-    for files in os.listdir('./boxedImages/'):
-        img = cv2.imread('./boxedImages/'+files)
+    files = os.listdir('./boxedImages/')
+    files.sort()
+    for f in files:
+        img = cv2.imread('./boxedImages/'+f)
         video.write(img)
-
-    
     video.release() 
+
     # for files in glob.glob("./boxedImages/*"):
     #     img = cv2.imread(files)
     #     video.write(img)
@@ -80,7 +85,7 @@ def videoToFaces(videoPath, outputPath):
     return classes
 
 
-classes = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
+#classes = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
 
 # outputPath = './videos/out.mp4'
 
