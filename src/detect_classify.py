@@ -92,8 +92,10 @@ def videoToFaces(videoPath, outputPath):
     video = cv2.VideoWriter(outputPath, fourcc, 30, (1280, 720))
 
 
-    for files in os.listdir('./boxedImages/'):
-        img = cv2.imread('./boxedImages/'+files)
+    files = os.listdir('./boxedImages/')
+    files.sort()
+    for f in files:
+        img = cv2.imread('./boxedImages/'+f)
         video.write(img)
 
     video.release() 
@@ -103,27 +105,5 @@ def videoToFaces(videoPath, outputPath):
 
 # classes = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
 
-# outputPath = './videos/out.mp4'
 
 
-# fourcc = cv2.VideoWriter_fourcc(*'MP4V')
-# print("here") 
-
-# video = cv2.VideoWriter(outputPath, fourcc, 24, (1280, 720))
-# print("here")
-
-# # for files in glob.glob("./boxedImages/*"):
-# #     img = cv2.imread(files)
-# #     video.write(img)
-# # video.release()
-
-# for files in os.listdir('./boxedImages/'):
-#     print(files)
-#     img = cv2.imread('./boxedImages/'+files)
-#     print('files')
-#     video.write(img)
-
-# video.release()
-
-#for aclass in classes:
-#    print(aclass)

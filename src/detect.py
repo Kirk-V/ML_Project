@@ -95,7 +95,7 @@ def crop(boxList, directory='./boxedImages'):
         # os.remove('./croppedImages/'+imgName)
 
 
-def box(boxList, classes, class_col, indirectory='boxedImages', outdirectory='boxImages'):
+def box(boxList, classes, class_col, indirectory='boxedImages'):
     for img in classes:
         imgName = img[0][1:]
         boxNum = int(img[0][0])
