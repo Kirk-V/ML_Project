@@ -14,6 +14,7 @@ from shutil import rmtree
 # useful links 
 # Captureing frames from vid: https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html#a473055e77dd7faa4d26d686226b292c1
 
+celebs = ['Craig Robinson', 'Danny McBride', 'Jay Baruchel', 'Jonah Hill', 'Seth Rogan']
 
 def videoToFaces(videoPath):
     for path in Path("./imagesToDetect").glob("**/*"):
@@ -27,16 +28,17 @@ def videoToFaces(videoPath):
         elif path.is_dir():
             rmtree(path)
 
-    framer = FrameExtractor(videoPath, 100)
+    framer = FrameExtractor(videoPath, 500)
     framer.store_frames('imagesToDetect')
     # detect faces in imagesToDetect
     prediction = detect_object()
     crop(prediction, './detectedImages')
     classification = face_recognition()
-    classes = filter(classification)
+    classes = filter(classification, celebs)
     return classes
 
 
-classes = videoToFaces('./videos/THIS IS THE END - Official Redband Trailer - In Theaters 6_12.mp4')
+classes = videoToFaces('./videos/This Is The End - Best Bits.mp4')
 
-print(classes)
+for aclass in classes:
+    print(aclass)
