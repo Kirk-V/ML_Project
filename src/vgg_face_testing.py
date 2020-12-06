@@ -19,9 +19,8 @@ def face_recognition():
         # cv2.imshow('image', input_im)
         input_original = input_im.copy()
         input_original = cv2.resize(input_original, None, fx=0.5, fy=0.5, interpolation = cv2.INTER_LINEAR)
-
-        input_im = cv2.resize(input_im, (224, 224), 3, interpolation = cv2.INTER_LINEAR)
         input_im = input_im / 255.
+        input_im = cv2.resize(input_im, (224, 224), 3, interpolation = cv2.INTER_LINEAR)
         input_im = input_im.reshape(1,224,224,3)
         # cv2.imshow('image', input_im)
         # Get Prediction
@@ -29,5 +28,6 @@ def face_recognition():
         conf.append([file, res])
 
     os.chdir("..")
+    session.close()
     # conf is list of tuples; tuple is (filename, confidence list)
     return conf

@@ -48,12 +48,11 @@ def Fc(bottom_model, num_classes):
     top_model = Dense(1024,activation='relu')(top_model)
     top_model = Dense(512,activation='relu')(top_model)
     top_model = Dense(num_classes,activation='softmax')(top_model)
-    return top_mod
+    return top_model
 
 
 # Set our class number to 3 (Young, Middle, Old)
-num_classes = 5
-
+num_classes = 6
 FC_Head = Fc(vgg, num_classes)
 
 model = Model(inputs = vgg.input, outputs = FC_Head)
@@ -77,7 +76,7 @@ train_datagen = ImageDataGenerator(
 validation_datagen = ImageDataGenerator(rescale=1./255)
  
 # set our batch size (typically on most mid tier systems we'll use 16-32)
-batch_size = 64
+batch_size = 32
  
 train_generator = train_datagen.flow_from_directory(
         train_data_dir,
@@ -85,7 +84,6 @@ train_generator = train_datagen.flow_from_directory(
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
         seed=42,
-        color_mode='grayscale',
         class_mode='categorical')
 
 print("#####################:")
@@ -96,7 +94,6 @@ validation_generator = train_datagen.flow_from_directory(
         subset="validation",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
-        color_mode='grayscale',
         seed=42,
         class_mode='categorical')
 
@@ -108,7 +105,7 @@ checkpoint = ModelCheckpoint("face_vgg.h5",
 
 earlystop = EarlyStopping(monitor = 'val_loss', 
                           min_delta = 0, 
-                          patience = 3,
+                          patience = 4,
                           verbose = 1,
                           restore_best_weights = True)
 
@@ -118,19 +115,18 @@ callbacks = [earlystop, checkpoint]
 model.compile(loss = 'categorical_crossentropy', 
               optimizer = RMSprop(lr = 0.001),
               metrics = ['accuracy'])
-# Enter the number of training and validation samples here
-nb_train_samples = 200
-nb_validation_samples = 200
+
+
+
 # We only train 50 EPOCHS
-epochs = 20
+epochs = 30
 batch_size = 64
 history = model.fit(
     train_generator,
-    # steps_per_epoch = nb_train_samples // batch_size,
     epochs = epochs,
     callbacks = callbacks,
     validation_data = validation_generator)
-    # validation_steps = nb_validation_samples // batch_size)
+
 
 #Fine Tune
 vgg.trainable = True
@@ -148,7 +144,6 @@ for (i,layer) in enumerate(vgg.layers):
 
 fine_tune_epochs = 10
 total_epochs = fine_tune_epochs + epochs
-# total_epochs =  initial_epochs + fine_tune_epochs
 model.summary()
 
 history_fine = model.fit(train_generator,

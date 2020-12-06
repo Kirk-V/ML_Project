@@ -12,10 +12,8 @@ import glob
 from pathlib import Path
 from shutil import rmtree
 
-# useful links 
-# Captureing frames from vid: https://docs.opencv.org/3.4/d8/dfe/classcv_1_1VideoCapture.html#a473055e77dd7faa4d26d686226b292c1
-
-celebs = ['Craig Robinson', 'Danny McBride', 'Jay Baruchel', 'Jonah Hill', 'Seth Rogan']
+#Globals for classes/colours of boxes
+celebs = ['Craig Robinson', 'Danny McBride', 'James Franco', 'Jay Baruchel', 'Jonah Hill', 'Seth Rogan']
 colors = [(255,0,0), (0,255,0),  (0, 0, 255), (255,225,25), (145, 30, 180), (240,50,230), (170, 110, 40)]
 
 def videoToFaces(videoPath, outputPath):
@@ -73,7 +71,6 @@ def videoToFaces(videoPath, outputPath):
     classification = face_recognition()
 
 
-
     classes = filter(classification, celebs)
     for classified in classes:
         value = classified[2]
@@ -103,7 +100,7 @@ def videoToFaces(videoPath, outputPath):
     return classes, returnList
 
 
-# classes = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
+classes = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
 
 
 

@@ -36,6 +36,7 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
     yolo = YOLO()
 
     # list for min 
+    # images = []
     detections = []
     
     #iterate over all images in detect folder, try to open image and detect
@@ -61,6 +62,7 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
       if save_img:
           new_image.save(os.path.join(save_img_path, img_out))
 
+    session.close()
     return detections
 
 
