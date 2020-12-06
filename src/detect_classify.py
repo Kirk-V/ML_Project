@@ -100,7 +100,7 @@ def videoToFaces(videoPath, outputPath):
 
     video.release() 
     
-    return classes
+    return classes, returnList
 
 
 # classes = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
