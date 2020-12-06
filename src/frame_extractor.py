@@ -78,7 +78,6 @@ class FrameExtractor:
             name of the directory to create where frames will be stored
 
         """
-        print(self.path)
         self.make_dir(directory)
         count = 0
         video = cv2.VideoCapture(self.path)
@@ -86,7 +85,6 @@ class FrameExtractor:
         if (video.isOpened()== False): 
             print("Error opening video file")
         length = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-        print("The video has {} Frames".format(length))
 
         while(video.isOpened()):
             ret, frame = video.read()
@@ -95,7 +93,7 @@ class FrameExtractor:
                 if (self.showFrames):
                     cv2.imshow('Frame',frame)
 
-                cv2.imwrite( directory + "/frame%d.jpg" % count, frame) 
+                cv2.imwrite( directory + "/%dframe.jpg" % count, frame) 
                 count += self.rate
                 if (count > length):
                     break

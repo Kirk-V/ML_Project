@@ -8,6 +8,6 @@ def filter(classification_data, classesAvailable):
         classes = image[1]
         bestValue = max(classes[0])
         bestIndex = np.argmax(classes[0])
-        if (bestValue>.8):
+        if (bestValue>.5):
             classesFound.append([name, classesAvailable[bestIndex], bestValue])
     return classesFound

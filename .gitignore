@@ -7,6 +7,8 @@ src/videos/*
 src/detectedImages/*.jpg
 src/imagesToDetect/*.jpg
 src/boxImages/*
+src/boxedImages/*
+src/croppedImages/*
 
 # pycache #
 ###################
