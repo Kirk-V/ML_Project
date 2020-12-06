@@ -8,6 +8,7 @@ import json
 import mimetypes
 
 from moviepy.video.io.ffmpeg_tools import ffmpeg_extract_subclip
+from moviepy.editor import *
 
 sys.path.append("../src")
 from detect_classify import *
@@ -91,7 +92,7 @@ class Handler(http.server.SimpleHTTPRequestHandler):
                                    "../website/tmp/" + str(Handler.count) + "_clip_annotated.mp4")
             print(os.getcwd())
             os.chdir("../website")
-            
+                        
             response = json.dumps({"results": [{"class": "Actor 1", "probability": "0.80", "color": "blue"},
                                                {"class": "Actor 2", "probability": "0.10", "color": "Red"},
                                                {"class": "Actor 3", "probability": "0.10", "color": "Green"}]})
