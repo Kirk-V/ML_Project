@@ -144,6 +144,7 @@ function send_json(that) {
     httpRequest.onreadystatechange = function() {
 	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
 	    console.log("send_json() successful");
+	    document.getElementById("status").innerHTML = "JSON data Received (200)";
 	}
     };
     
@@ -151,7 +152,8 @@ function send_json(that) {
     body.start = start_time;
     body.end = stop_time;
     body.file_type = file.type;
-    
+
+    document.getElementById("status").innerHTML = "Sent JSON data";
     httpRequest.send(JSON.stringify(body));
 }
 
@@ -164,11 +166,13 @@ function send_data(that) {
     httpRequest.onreadystatechange = function() {
 	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
 	    console.log("send_data() successful")
+	    document.getElementById("status").innerHTML = "Binary data Received (200)";
 	    make_table(JSON.parse(this.responseText));
 	    get_data();
 	}
     };
     
+    document.getElementById("status").innerHTML = "Sent Binary data, wait for server to process";
     httpRequest.send(file);
 }
 
@@ -181,7 +185,7 @@ function get_data() {
     httpRequest.onreadystatechange = function() {
 	if(httpRequest.readyState === 4 && httpRequest.status === 200) {
 	    console.log("get_data() successful");
-	    
+	    document.getElementById("status").innerHTML = "Recieved Binary data (200)";
 	    const video = document.getElementById("output_video");
 	    let annotated_file = httpRequest.response
 	    let blob = new Blob([annotated_file], {type: "video/mp4"});
@@ -199,13 +203,12 @@ function get_data() {
 	    });
 	}
     };
-    
+
+    document.getElementById("status").innerHTML = "Requested Binary data";
     httpRequest.send();
 }
 
-function make_table(json) {
-    console.log(json);
-    
+function make_table(json) {   
     const table = document.getElementById("output_table");
     while(table.firstChild) {
 	table.firstChild.remove();
