@@ -44,6 +44,7 @@ function setup() {
 	if (handle) {
             end.value = value;
 	    stop_time = value;
+	    video.currentTime = value;
 	}
 	else {
             start.value = Math.round(value);
@@ -61,6 +62,7 @@ function setup() {
     end.addEventListener('change', function () {
 	slider.noUiSlider.set([null, this.value]);
 	stop_time = this.value;
+	video.currentTime = this.value;
     });
 
     //setup video
