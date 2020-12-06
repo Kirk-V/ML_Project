@@ -28,5 +28,6 @@ def face_recognition():
         res = classifier.predict(input_im, 1, verbose = 0)
         conf.append([file, res])
 
+    os.chdir("..")
     # conf is list of tuples; tuple is (filename, confidence list)
     return conf

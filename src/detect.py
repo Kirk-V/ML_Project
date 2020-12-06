@@ -96,3 +96,19 @@ def crop(boxList, directory='detectedImages'):
                 saveCount += 1
         os.remove(directory+'/'+imgName)
 
+
+def box(boxList, classes, indirectory='imagesToDetect', outdirectory='boxImages'):
+    for img in boxList:
+        imgName = img[0]
+        if len(img[1]) > 0:
+            image = cv2.imread(indirectory+'/'+imgName)
+            saveCount = 0
+            for box in img[1]:
+                left = box[0]
+                top = box[1]
+                right = box[2]
+                bottom = box[3]
+                boxed = cv2.rectangle(image, (left, top), (right, bottom), (255, 0, 0), 3)
+                saveDir = outdirectory+'/'+imgName
+                cv2.imwrite(saveDir, boxed)
+                saveCount += 1

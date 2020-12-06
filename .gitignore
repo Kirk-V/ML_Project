@@ -1,14 +1,12 @@
 # VideosFolder #
 ###################
-src/videos/*.mp4
-
-
+src/videos/*
 
 # Images Folders #
 ###################
 src/detectedImages/*.jpg
 src/imagesToDetect/*.jpg
-
+src/boxImages/*
 
 # pycache #
 ###################
@@ -25,5 +23,5 @@ website/tmp
 # dataSetToSend folder
 ####################
 src/dataSetToSend/*
-
 /src/face_vgg.h5
+src/keras_yolo3/model_data/yolo.h5
