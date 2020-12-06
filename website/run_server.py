@@ -88,14 +88,22 @@ class Handler(http.server.SimpleHTTPRequestHandler):
 
             os.chdir("../src")
             print(os.getcwd())
-            classes = videoToFaces("../website/tmp/" + str(Handler.count) + "_clip" + file_ext,
-                                   "../website/tmp/" + str(Handler.count) + "_clip_annotated.mp4")
+            classes, returnList = videoToFaces("../website/tmp/" + str(Handler.count) + "_clip" + file_ext,
+                                               "../website/tmp/" + str(Handler.count) + "_clip_annotated.mp4")
             print(os.getcwd())
             os.chdir("../website")
-                        
+
+            for i in returnList:
+                i.update({'max': str(i.get("max"))})
+                i.update({'color': str(i.get("color"))})
+            
+            response = json.dumps({"results": returnList})
+            
+            '''
             response = json.dumps({"results": [{"class": "Actor 1", "probability": "0.80", "color": "blue"},
                                                {"class": "Actor 2", "probability": "0.10", "color": "Red"},
                                                {"class": "Actor 3", "probability": "0.10", "color": "Green"}]})
+            '''
             
             self.send_response(200)
             self.send_header("Content-Type", "video/mp4")
