@@ -36,7 +36,6 @@ def detect_object(imageFolder='imagesToDetect/', postfix=""):
     yolo = YOLO()
 
     # list for min 
-    # images = []
     detections = []
     
     #iterate over all images in detect folder, try to open image and detect
@@ -94,10 +93,28 @@ def crop(boxList, directory='./boxedImages'):
                 saveDir = './croppedImages'+'/'+str(saveCount)+imgName
                 cropped.save(saveDir)
                 saveCount += 1
-        # os.remove('./croppedImages/'+imgName)
 
 
 def box(boxList, classes, class_col, indirectory='boxedImages'):
+    """
+    Updates the detected faces to include coloured boxes for classified faces.
+    This also write the label on the image 
+
+    Args:
+      Boxlist: list
+          A list of all bounding boxes from face detection
+
+      classes: list 
+          a list of all classified faces
+
+      Class_col: Dict{string:(r,g,b)}
+          A dictionary of {Label: colour} for the class
+        
+      indirectory: String
+          The string of the directory contianing face detected images
+
+    Returns:
+    """
     for img in classes:
         imgName = img[0][1:]
         boxNum = int(img[0][0])

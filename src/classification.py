@@ -28,6 +28,5 @@ def face_recognition():
         conf.append([file, res])
 
     os.chdir("..")
-    session.close()
     # conf is list of tuples; tuple is (filename, confidence list)
     return conf

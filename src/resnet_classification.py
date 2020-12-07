@@ -7,8 +7,17 @@ Original file is located at
     https://colab.research.google.com/drive/155DpJ_756FDztY5s6OX5EYBAKWyq9lXV
 """
 import tensorflow as tf
-from tensorflow.keras.applications import VGG16
+from tensorflow.keras.applications import VGG16, ResNet50V2
+from tensorflow.keras.models import Sequential
+from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, GlobalAveragePooling2D
+from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D, Lambda
+from tensorflow.keras.models import Model
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.optimizers import RMSprop, Adam
+from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
+import tensorflow_addons as tfa
 
+# Set GPU options
 gpu_options = tf.compat.v1.GPUOptions(allow_growth=True)
 session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_options=gpu_options))
 
@@ -16,7 +25,7 @@ session = tf.compat.v1.InteractiveSession(config=tf.compat.v1.ConfigProto(gpu_op
 img_rows, img_cols = 224, 224 
 
 # Re-loads the VGG model without the top or FC layers
-vgg = VGG16(weights = 'imagenet', 
+vgg = ResNet50V2(weights = 'imagenet', 
                  include_top = False, 
                  input_shape = (img_rows, img_cols, 3))
 
@@ -41,21 +50,14 @@ def Fc(bottom_model, num_classes):
     top_model = Dense(num_classes,activation='softmax')(top_model)
     return top_model
 
-from tensorflow.keras.models import Sequential
-from tensorflow.keras.layers import Dense, Dropout, Activation, Flatten, GlobalAveragePooling2D
-from tensorflow.keras.layers import Conv2D, MaxPooling2D, ZeroPadding2D
-from tensorflow.keras.models import Model
 
 # Set our class number to 3 (Young, Middle, Old)
-num_classes = 5
-
+num_classes = 6
 FC_Head = Fc(vgg, num_classes)
 
 model = Model(inputs = vgg.input, outputs = FC_Head)
 
 print(model.summary())
-
-from tensorflow.keras.preprocessing.image import ImageDataGenerator
 
 train_data_dir = "./DataSetToSend/"
 # validation_data_dir = '/content/drive/My Drive/image_dataset/validate/'
@@ -65,8 +67,9 @@ train_datagen = ImageDataGenerator(
       validation_split=0.2,
       rescale=1./255,
       rotation_range=45,
-      width_shift_range=0.3,
-      height_shift_range=0.3,
+      width_shift_range=0.2,
+      height_shift_range=0.2,
+      zoom_range=0.6,
       horizontal_flip=True,
       fill_mode='nearest')
  
@@ -80,17 +83,22 @@ train_generator = train_datagen.flow_from_directory(
         subset="training",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
+        seed=42,
+        interpolation='bilinear',
         class_mode='categorical')
+
+print("#####################:")
+print(train_generator.class_indices)
  
 validation_generator = train_datagen.flow_from_directory(
         train_data_dir,
         subset="validation",
         target_size=(img_rows, img_cols),
         batch_size=batch_size,
+        seed=42,
+        interpolation='bilinear',
         class_mode='categorical')
 
-from tensorflow.keras.optimizers import RMSprop
-from tensorflow.keras.callbacks import ModelCheckpoint, EarlyStopping
 checkpoint = ModelCheckpoint("face_vgg.h5",
                              monitor="val_loss",
                              mode="min",
@@ -99,39 +107,67 @@ checkpoint = ModelCheckpoint("face_vgg.h5",
 
 earlystop = EarlyStopping(monitor = 'val_loss', 
                           min_delta = 0, 
-                          patience = 3,
+                          patience = 4,
                           verbose = 1,
                           restore_best_weights = True)
 
 # we put our call backs into a callback list
 callbacks = [earlystop, checkpoint]
 # We use a very small learning rate 
-model.compile(loss = 'categorical_crossentropy',
+model.compile(loss = 'categorical_crossentropy', 
               optimizer = RMSprop(lr = 0.001),
               metrics = ['accuracy'])
-# Enter the number of training and validation samples here
-nb_train_samples = 200
-nb_validation_samples = 200
+
+
+
 # We only train 50 EPOCHS
-epochs = 50
+epochs = 30
 batch_size = 64
-history = model.fit_generator(
+history = model.fit(
     train_generator,
-    # steps_per_epoch = nb_train_samples // batch_size,
     epochs = epochs,
     callbacks = callbacks,
     validation_data = validation_generator)
-    # validation_steps = nb_validation_samples // batch_size)
 
-## Visualizing results
+
+#Fine Tune
+vgg.trainable = True
+adam = Adam(learning_rate=0.0001)
+
+#recompile model
+model.compile(loss = 'categorical_crossentropy',
+              optimizer = adam,
+              metrics = ['accuracy'])
+
+len(model.trainable_variables)
+
+for (i,layer) in enumerate(vgg.layers):
+    print(str(i) + " "+ layer.__class__.__name__, layer.trainable)
+
+fine_tune_epochs = 10
+total_epochs = fine_tune_epochs + epochs
+model.summary()
+
+history_fine = model.fit(train_generator,
+                        epochs=total_epochs,
+                        initial_epoch = history.epoch[-1],
+                        validation_data=validation_generator)
+
+epochs_range = range(epochs)
+
+
+model.save('face_vgg.h5')
+history = history_fine
+
+
+
+# Visualizing results
 import matplotlib.pyplot as plt
 acc = history.history['accuracy']
 val_acc = history.history['val_accuracy']
 
 loss = history.history['loss']
 val_loss = history.history['val_loss']
-
-epochs_range = range(epochs)
 
 plt.figure(figsize=(8, 8))
 plt.subplot(1, 2, 1)
