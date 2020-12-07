@@ -136,5 +136,5 @@ def videoToFaces(videoPath, outputPath):
     return classes, returnList
 
 
-classes, returnl = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
+# classes, returnl = videoToFaces('./videos/This Is The End - Best Bits_Trim.mp4', "./videos/out.mp4")
 

@@ -26,4 +26,5 @@ website/tmp/*
 ####################
 src/dataSetToSend/*
 /src/face_vgg.h5
+/src/*.h5
 src/keras_yolo3/model_data/yolo.h5
