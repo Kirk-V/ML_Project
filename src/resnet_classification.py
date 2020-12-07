@@ -69,7 +69,7 @@ batch_size = 32
 
 # Generators infer labels from class mode and get class mode. Categorical as we are finding actors
 #   Seed is to have consistency for random elements
-#   Bilinear interpologation to get image to 224 x 224
+#   Bilinear interpolation to get image to 224 x 224
 train_generator = train_datagen.flow_from_directory(
     image_dir,
     class_mode='categorical',
