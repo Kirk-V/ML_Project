@@ -18,8 +18,8 @@ im_height, im_width = 224, 224
 num_classes = 6
 
 # Loads VGG trained on imagenet without the top layer
-vgg = ResNet50V2(weights = 'imagenet', 
-                 include_top = False, 
+vgg = ResNet50V2(weights = 'imagenet',
+                 include_top = False,
                  input_shape = (im_height, im_width, 3))
 
 # Freeze the VGG layers
@@ -96,7 +96,7 @@ model_checkpoint = ModelCheckpoint(
     verbose=1,
     save_best_only = True,
     mode="min",
-    )
+)
 
 # Same principle as above, patience is 4 epochs with no changes
 early_stopping = EarlyStopping(
@@ -107,7 +107,7 @@ early_stopping = EarlyStopping(
 
 # Has to be categorical cross-entropy as people are discrete
 #   Simply train on accuracy. RMSProp can be useful for image classification, watches moving average of SGD
-model.compile(loss = 'categorical_crossentropy', 
+model.compile(loss = 'categorical_crossentropy',
               optimizer = RMSprop(lr = 0.001),
               metrics = ['accuracy'])
 
