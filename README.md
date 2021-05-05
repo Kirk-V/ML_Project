@@ -10,7 +10,6 @@ This project features a web based tool to classify movie stars within a scene of
 
 ### Built With
 
-This section should list any major frameworks that you built your project using. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
 * [Python](https://www.python.org/)
 * [Keras](https://keras.io/)
 * [TensorFlow](https://www.tensorflow.org/)
