@@ -36,16 +36,15 @@ see requirements.txt for package versions
 
 ### Installation
 
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
+1. Clone the repo
    ```sh
    git clone https://github.com/Kirk-V/ML_Project.git
    ```
-3. Install NPM packages
+2. Install NPM packages
    ```sh
    pip install requirements.txt
    ```
-4. Navigate to website directory
+3. Navigate to website directory
    ```sh
    python run_server.py
    ```
